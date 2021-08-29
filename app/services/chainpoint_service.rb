@@ -1,6 +1,6 @@
 class ChainpointService
-  def self.submit(cryptographic_hash)
-    response = HTTP.post(ENV['CHAINPOINT_URL'], json: { hashes: [cryptographic_hash] })
+  def self.submit(*hashes)
+    response = HTTP.post(ENV['CHAINPOINT_URL'], json: { hashes: hashes })
 
     raise Error::BusinessError.new('OPS! An error has occurred trying to send information to Chainpoint') if response.code != 200
 

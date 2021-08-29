@@ -21,20 +21,22 @@ RSpec.describe "Api::V1::Badges", type: :request do
         }.to_json
       end
 
+      let(:badge) { FactoryBot.build(:badge) }
+
       before do
         stub_request(:post, /#{ENV['CHAINPOINT_URL']}/).
           to_return(body: successful_response_body, status: 200)
-
-        post api_v1_badge_index_path, params: { badge: { issue_date: DateTime.current,  name: Faker::Lorem.sentence(word_count: 2), uuid: Faker::Internet.uuid  }  }
+          post api_v1_badge_index_path, params: { badge:  badge.as_json }
       end
 
       it 'returns a successful response' do
         expect(response).to have_http_status(:successful)
       end
 
-      it 'returns chainpoint response' do
+      it 'returns chainpoint response and the badge' do
         response_json = JSON.parse(response.body)
-        expect(response.body).to match(/#{successful_response_body}/)
+        expect(response_json['chainpoint_response'].to_json).to eq(successful_response_body)
+        expect(response_json['badge'].except('errors', 'validation_context')).to eq(badge.as_json)
       end
     end
 
